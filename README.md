@@ -4,7 +4,7 @@ Okulun özelliklerini girip bina arketipini belirleyen, renovasyon önlemlerini 
 ısı pompası, güneş paneli) 3B model üzerinde deneyip enerji, emisyon, geri ödeme ve yaz konforu etkisini
 gösteren sayfa. Türkçe / İngilizce.
 
-Canlı: https://omurbugra.github.io/site-2/ · Ana 3B okul modeli: https://omurbugra.github.io/solarpes/
+Canlı: https://omurbugra.github.io/solarpes-2/ · Ana 3B okul modeli: https://omurbugra.github.io/solarpes/
 
 ## Yapı
 
