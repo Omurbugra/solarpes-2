@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Senaryo kur ve analiz et – SolarPES</title>
+<meta name="description" content="Okulunuzu tanımlayın, bina arketipini belirleyin, renovasyon önlemlerini 3B model üzerinde deneyip enerji, emisyon, maliyet ve yaz konforu etkisini görün.">
+<link rel="preload" href="assets/kit.glb" as="fetch" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-roof" viewBox="0 0 24 24"><path d="M3 11l9-6 9 6"/><path d="M5 10v9h14v-9"/></symbol>
+    <symbol id="i-wall" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M3 10h18M3 15h18M9 4v6M15 10v5M9 15v5"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-ground" viewBox="0 0 24 24"><path d="M3 9h18"/><path d="M3 14l3-3M8 14l3-3M13 14l3-3M18 14l3-3"/><path d="M3 19h18"/></symbol>
+    <symbol id="i-shade" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M12 2v1.5M18 8h-1.5M6 8H4.5M16 4l-1 1M8 4l1 1"/><path d="M4 14h16M6 18h12"/></symbol>
+    <symbol id="i-pv" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="11" rx="1"/><path d="M3 9h18M3 12.5h18M9 5v11M15 5v11"/><path d="M12 16v3M9 22h6"/></symbol>
+    <symbol id="i-hp" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><circle cx="9" cy="12" r="3"/><path d="M9 9v6M6 12h6M16 10v4M19 10v4"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4h4"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.3 4.9"/><path d="M4 12a8 8 0 0 1 14.3-4.9"/><path d="M18 3v4.5h-4.5M6 21v-4.5h4.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.2v.1"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/></symbol>
+    <symbol id="p-flat" viewBox="0 0 40 40"><rect x="4" y="15" width="32" height="10"/></symbol>
+    <symbol id="p-l" viewBox="0 0 40 40"><path d="M6 4h9v23h19v9H6z"/></symbol>
+    <symbol id="p-u" viewBox="0 0 40 40"><path d="M4 6h9v19h14V6h9v28H4z"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <a class="brand" href="./"><b>SolarPES</b><span data-i18n="pageTitle">Senaryo kur ve analiz et</span></a>
+  <nav class="steps" id="steps" aria-label="Adımlar">
+    <button type="button" data-step="1" aria-current="step"><i>1</i><span data-i18n="step1">Binayı tanımla</span></button>
+    <button type="button" data-step="2" disabled><i>2</i><span data-i18n="step2">Renovasyon uygula</span></button>
+    <button type="button" data-step="3" disabled><i>3</i><span data-i18n="step3">Rapor</span></button>
+  </nav>
+  <div class="top-r">
+    <div class="lang" role="group" aria-label="Dil / Language">
+      <button type="button" data-lang="tr" aria-pressed="true">TR</button><button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="theme" id="themeBtn" type="button" data-i18n-aria="theme" aria-label="Tema değiştir"><span></span></button>
+    <a class="toplink" href="https://omurbugra.github.io/solarpes/" data-i18n="schoolModel">3B okul modeli</a>
+  </div>
+</header>
+
+<main>
+  <!-- ===================== 1 · BİNA ===================== -->
+  <section class="step s1" id="step1">
+    <div class="viewer" id="view1">
+      <div class="mount" id="mount1"></div>
+      <div class="titleblock" id="titleBlock"></div>
+      <div class="ctl">
+        <span class="compass" title="Kuzey" aria-hidden="true"><i></i><b>K</b></span>
+        <button type="button" data-rot aria-pressed="true" data-i18n-title="rot" title="Otomatik döndür"><svg class="ico"><use href="#i-rotate"/></svg></button>
+        <button type="button" data-home data-i18n-title="home" title="Görünümü sıfırla"><svg class="ico"><use href="#i-reset"/></svg></button>
+      </div>
+      <div class="loader" id="loader"><span id="ldText">Yapı kiti yükleniyor</span><i><em id="ldBar"></em></i></div>
+    </div>
+
+    <div class="sheet" id="form">
+      <header class="sheet-h">
+        <h1 data-i18n="h1">Önce okulunuzu tanımlayın</h1>
+        <p data-i18n="lead">Binanın bildiğiniz özelliklerini girin. SolarPES onu bina arketiplerinden birine eşler ve model siz yazdıkça güncellenir. Ardından renovasyon önlemlerini bu arketip üzerinde denersiniz.</p>
+      </header>
+
+      <fieldset class="sec">
+        <legend><i>1</i><span data-i18n="s1">Bina</span></legend>
+        <div class="grid">
+          <label class="f"><span data-i18n="fSchool">Okul türü</span>
+            <select data-k="schoolType"><option value="ilk" data-i18n="oIlk">İlkokul</option><option value="orta" data-i18n="oOrta">Ortaokul</option><option value="lise" selected data-i18n="oLise">Lise</option></select></label>
+          <div class="f"><span data-i18n="fFloors">Kat sayısı</span>
+            <div class="seg" data-seg="floors" data-num><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button><button type="button" data-v="3" aria-pressed="true">3</button><button type="button" data-v="4">4</button></div></div>
+          <div class="f wide"><span data-i18n="fPlan">Plan biçimi</span>
+            <div class="plans" data-seg="plan">
+              <button type="button" data-v="flat" aria-pressed="true"><svg viewBox="0 0 40 40"><use href="#p-flat"/></svg><b data-i18n="pFlat">Düz (I)</b><small>56 × 14 m</small></button>
+              <button type="button" data-v="l"><svg viewBox="0 0 40 40"><use href="#p-l"/></svg><b data-i18n="pL">L biçimi</b><small>42 × 49 m</small></button>
+              <button type="button" data-v="u"><svg viewBox="0 0 40 40"><use href="#p-u"/></svg><b data-i18n="pU">U biçimi</b><small>49 × 42 m</small></button></div></div>
+          <label class="f"><span data-i18n="fEra">Yapım dönemi</span>
+            <select data-k="era"><option value="pre80" data-i18n="oPre80">1980 öncesi</option><option value="80_00" selected data-i18n="o8000">1980–2000</option><option value="post00" data-i18n="oPost00">2000 sonrası</option></select></label>
+          <label class="f"><span data-i18n="fOrient">Uzun cepheler hangi yöne bakıyor</span>
+            <select data-k="orient"><option value="ns" selected data-i18n="oNS">Kuzey ve güney</option><option value="ew" data-i18n="oEW">Doğu ve batı</option></select></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="sec">
+        <legend><i>2</i><span data-i18n="s2">Kabuk</span></legend>
+        <div class="grid">
+          <label class="f"><span data-i18n="fWall">Duvar malzemesi</span>
+            <select data-k="wall"><option value="brick_hollow" data-i18n="oHollow">Delikli tuğla</option><option value="brick_solid" data-i18n="oSolid">Dolu tuğla</option><option value="aac" data-i18n="oAac">Gazbeton</option><option value="rc" data-i18n="oRc">Betonarme perde</option></select></label>
+          <div class="f"><span data-i18n="fGlaz">Cam</span>
+            <div class="seg glaz" data-seg="glaz"><button type="button" data-v="single" aria-pressed="true"><i></i><span data-i18n="gSingle">Tek</span></button><button type="button" data-v="double"><i></i><span data-i18n="gDouble">Çift</span></button><button type="button" data-v="triple"><i></i><span data-i18n="gTriple">Üçlü</span></button></div></div>
+          <div class="f"><span data-i18n="fWwr">Pencere alanı</span>
+            <div class="seg" data-seg="wwr"><button type="button" data-v="low" data-i18n="wLow">Az</button><button type="button" data-v="mid" aria-pressed="true" data-i18n="wMid">Orta</button><button type="button" data-v="high" data-i18n="wHigh">Çok</button></div></div>
+          <div class="f"><span data-i18n="fRoofT">Çatı</span>
+            <div class="seg" data-seg="roofT"><button type="button" data-v="flat" aria-pressed="true" data-i18n="rFlat">Düz</button><button type="button" data-v="pitch" data-i18n="rPitch">Eğimli</button></div></div>
+          <div class="f ins"><span data-i18n="fInsWall">Duvar yalıtımı</span>
+            <label class="tog"><input type="checkbox" data-k="insWall"><span class="sw"></span></label>
+            <div class="rng thk"><input type="range" min="2" max="12" step="1" value="5" data-k="insWallThk" aria-label="cm"><output>5 cm</output></div></div>
+          <div class="f ins"><span data-i18n="fInsRoof">Çatı yalıtımı</span>
+            <label class="tog"><input type="checkbox" data-k="insRoof"><span class="sw"></span></label>
+            <div class="rng thk"><input type="range" min="2" max="16" step="1" value="8" data-k="insRoofThk" aria-label="cm"><output>8 cm</output></div></div>
+          <div class="f ins"><span data-i18n="fInsGround">Zemin yalıtımı</span>
+            <label class="tog"><input type="checkbox" data-k="insGround"><span class="sw"></span></label>
+            <div class="rng thk"><input type="range" min="2" max="10" step="1" value="4" data-k="insGroundThk" aria-label="cm"><output>4 cm</output></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="sec">
+        <legend><i>3</i><span data-i18n="s3">Sistem ve kullanım</span></legend>
+        <div class="grid">
+          <label class="f"><span data-i18n="fHeat">Isıtma</span>
+            <select data-k="heating"><option value="gas" selected data-i18n="oGas">Doğalgaz kazanı</option><option value="coal" data-i18n="oCoal">Kömür kazanı</option><option value="elec" data-i18n="oElec">Elektrikli</option><option value="hp" data-i18n="oHp">Isı pompası</option></select></label>
+          <label class="f"><span data-i18n="fCool">Soğutma</span>
+            <select data-k="cooling"><option value="none" selected data-i18n="oNone">Yok</option><option value="split" data-i18n="oSplit">Split klima</option><option value="vrf" data-i18n="oVrf">VRF</option></select></label>
+          <div class="f"><span data-i18n="fUsage">Öğretim düzeni</span>
+            <div class="seg" data-seg="usage"><button type="button" data-v="full" aria-pressed="true" data-i18n="uFull">Tam gün</button><button type="button" data-v="double" data-i18n="uDouble">İkili öğretim</button></div></div>
+          <div class="f"><span data-i18n="fStudents">Öğrenci sayısı</span>
+            <div class="rng"><input type="range" min="100" max="1500" step="50" value="600" data-k="students" aria-label="Öğrenci sayısı"><output>600</output></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="sec">
+        <legend><i>4</i><span data-i18n="s4">Mekânlar ve kullanım</span><em data-i18n="optional">isteğe bağlı</em></legend>
+        <p class="hint" data-i18n="s4hint">Bu bölümü doldurmak tahmini belirgin biçimde iyileştirir. Okul idaresinde bu bilgilerin hepsi vardır.</p>
+        <div class="grid">
+          <div class="f"><span data-i18n="fRooms">Derslik sayısı</span>
+            <div class="rng"><input type="range" min="6" max="60" step="1" value="24" data-k="rooms" aria-label="Derslik sayısı"><output>24</output></div>
+            <small data-i18n="fRoomsHint">İç kazanç ve havalandırma ihtiyacı buradan hesaplanır.</small></div>
+          <label class="f"><span data-i18n="fArea">Toplam kapalı alan</span>
+            <span class="num"><input type="number" min="500" max="30000" step="50" placeholder="örn. 5100" data-i18n-ph="exNone" data-k="area"><em>m²</em></span>
+            <small id="areaHint"></small></label>
+          <div class="f"><span data-i18n="fHgt">Kat yüksekliği</span>
+            <div class="seg" data-seg="hgt" data-num><button type="button" data-v="2.8">2,8 m</button><button type="button" data-v="3.2" aria-pressed="true">3,2 m</button><button type="button" data-v="3.6">3,6 m</button></div></div>
+          <label class="f"><span data-i18n="fRoofA">Panel konabilecek çatı alanı</span>
+            <span class="num"><input type="number" min="50" max="12000" step="10" data-k="roofA"><em>m²</em></span>
+            <small id="roofHint"></small></label>
+          <div class="f wide"><span data-i18n="fSpaces">Özel mekânlar</span>
+            <div class="chips" data-multi="spaces">
+              <button type="button" data-v="gym" data-i18n="spGym">Spor salonu</button><button type="button" data-v="kitchen" data-i18n="spKitchen">Mutfaklı yemekhane</button><button type="button" data-v="lab" data-i18n="spLab">Laboratuvar</button><button type="button" data-v="dorm" data-i18n="spDorm">Pansiyon</button><button type="button" data-v="hall" data-i18n="spHall">Konferans salonu</button></div>
+            <small data-i18n="fSpacesHint">Pansiyon binayı günün her saati kullanımda tutar; sonucu en çok değiştiren seçenek budur.</small></div>
+          <div class="f"><span data-i18n="fHours">Günlük kullanım</span>
+            <div class="seg" data-seg="hours" data-num><button type="button" data-v="8" aria-pressed="true" data-i18n="h8">8 saat</button><button type="button" data-v="10" data-i18n="h10">10 saat</button><button type="button" data-v="12" data-i18n="h12">12 ve üstü</button></div></div>
+          <div class="f"><span data-i18n="fSummer">Yaz tatilinde kullanım</span>
+            <div class="seg" data-seg="summer"><button type="button" data-v="none" aria-pressed="true" data-i18n="sNone">Kapalı</button><button type="button" data-v="some" data-i18n="sSome">Kısmen</button><button type="button" data-v="full" data-i18n="sFull">Açık</button></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="sec">
+        <legend><i>5</i><span data-i18n="s5">Faturalar</span><em data-i18n="optional">isteğe bağlı</em></legend>
+        <p class="hint" data-i18n="s5hint">En değerli girdi: model tahmin etmek yerine gerçek tüketiminize göre ayarlanır.</p>
+        <div class="grid">
+          <label class="f"><span data-i18n="fGasBill">Yıllık doğalgaz</span>
+            <span class="num"><input type="number" min="0" step="100" placeholder="örn. 42000" data-i18n-ph="exGas" data-k="gas"><em>m³</em></span></label>
+          <label class="f"><span data-i18n="fElecBill">Yıllık elektrik</span>
+            <span class="num"><input type="number" min="0" step="100" placeholder="örn. 96000" data-i18n-ph="exElec" data-k="elec"><em>kWh</em></span></label>
+          <div class="f"><span data-i18n="fLight">Aydınlatma</span>
+            <div class="seg" data-seg="light"><button type="button" data-v="fl" aria-pressed="true" data-i18n="lFl">Floresan</button><button type="button" data-v="led" data-i18n="lLed">LED</button><button type="button" data-v="mix" data-i18n="lMix">Karışık</button></div></div>
+          <div class="f"><span data-i18n="fBoiler">Kazan yaşı</span>
+            <div class="seg" data-seg="boiler"><button type="button" data-v="old" aria-pressed="true" data-i18n="bOld">15+ yıl</button><button type="button" data-v="mid" data-i18n="bMid">5–15 yıl</button><button type="button" data-v="new" data-i18n="bNew">0–5 yıl</button></div></div>
+        </div>
+      </fieldset>
+
+      <div class="go">
+        <p id="cmpText"></p>
+        <button class="btn" id="setArch" type="button" data-i18n="setArch">Arketipi belirle</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 2 · RENOVASYON ===================== -->
+  <section class="step s2" id="step2" hidden>
+    <header class="arch" id="archBar"></header>
+    <div class="s2-grid">
+      <aside class="measures">
+        <h2 data-i18n="measures">Renovasyon önlemleri</h2>
+        <p class="hint" data-i18n="measuresHint">Eklemek için tıklayın ya da modelin üstüne sürükleyin.</p>
+        <div id="sysList"></div>
+      </aside>
+
+      <div class="viewer stage" id="view2">
+        <div class="mount" id="mount2"></div>
+        <div class="toggles">
+          <div class="seg sm" id="segClimate" role="group" data-i18n-aria="climate" aria-label="İklim"><button type="button" data-v="present" aria-pressed="true" data-i18n="today">Bugün</button><button type="button" data-v="future" data-i18n="y2050">2050</button></div>
+          <div class="seg sm" id="segTier" role="group" data-i18n-aria="tier" aria-label="Kabuk düzeyi"><button type="button" data-v="ts825" aria-pressed="true">TS 825</button><button type="button" data-v="passive">Passive</button></div>
+        </div>
+        <div class="ctl">
+          <span class="compass" title="Kuzey" aria-hidden="true"><i></i><b>K</b></span>
+          <button type="button" data-rot aria-pressed="false" data-i18n-title="rot" title="Otomatik döndür"><svg class="ico"><use href="#i-rotate"/></svg></button>
+          <button type="button" data-home data-i18n-title="home" title="Görünümü sıfırla"><svg class="ico"><use href="#i-reset"/></svg></button>
+        </div>
+        <div class="tags" id="appliedTags"></div>
+        <div class="warn" id="warnbox" role="status"><svg class="ico"><use href="#i-warn"/></svg><span id="warnText"></span></div>
+        <div class="dropcue" id="dropcue"></div>
+      </div>
+
+      <aside class="ekb-panel">
+        <h2 data-i18n="ekbTitle">Enerji sınıfı</h2>
+        <div class="ekb" id="ekb"></div>
+        <p class="hint" data-i18n="ekbNote">Enerji Kimlik Belgesi ölçeği. Mevcut bina solda, senaryonuz sağda işaretli.</p>
+        <dl class="ind" id="kpiBox"></dl>
+      </aside>
+    </div>
+
+    <div class="s2-foot">
+      <section>
+        <h3 data-i18n="carriers">Enerji nereden geliyor</h3>
+        <div id="carrierBox"></div>
+      </section>
+      <section>
+        <h3 data-i18n="contrib">Her önlem ne kattı</h3>
+        <div id="wfallBox"></div>
+      </section>
+      <section class="cta">
+        <p data-i18n="ctaNote">Değerler gerçek simülasyonlardan türetilmiş tahminlerdir; arketip tek tek simüle edilmez.</p>
+        <button class="btn" id="analyzeBtn" type="button" data-i18n="analyze">Raporu oluştur</button>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div class="report-ov" id="reportOv" role="dialog" aria-modal="true" aria-label="Analiz raporu"><div class="report" id="report"></div></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
